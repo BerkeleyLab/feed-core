@@ -1,5 +1,4 @@
-LBNL Embedded Ethernet Protocol
-===============================
+# LBNL Embedded Ethernet Protocol
 
 A Request/Reply style protocol using UDP on port 50006.
 A Device (Server) receives Requests on port 50006 and responds to each valid Request with a single Reply.
@@ -7,8 +6,7 @@ A Device (Server) receives Requests on port 50006 and responds to each valid Req
 Requests and Replies act on 32-bit registers in a 64MB address space.
 The 24-bit Address field acts as the upper bits of a 26-bit address.
 
-UDP Message Format
-------------------
+## UDP Message Format
 
 <pre>
            0       1         2         3
@@ -44,8 +42,7 @@ Message fields are in Most Significant Byte first (MSB or network) byte order.
 
 It is _suggested_ to pad messages shorter than 32 bytes with reads of address 0.
 
-Message Fields
---------------
+## Message Fields
 
 ### Header
 
@@ -76,8 +73,7 @@ When Bits[4] is clear (Write operation) this field contains the value to be writ
 
 To read back the actual value of a register after a write operation, a Read operation with the same address may be added following a Write within the same message.
 
-Example message
----------------
+## Example message
 
 Request
 
@@ -109,8 +105,7 @@ A corresponding Reply might be:
 * A write of address 0x10000 with 0x12345678 is echoed.
 * Address 0x10000 reads 0x00345678 (perhaps due to truncation)
 
-Required Registers
-------------------
+## Required Registers
 
 ### 0x000000 - 0x000003
 
@@ -125,8 +120,16 @@ The first 4 registers will read back the 16 byte constant value "Hello World!\r\
 These 2048 registers access static configuration data.
 See section Configuration ROM.
 
-Configuration ROM Format
-------------------------
+If 0x800 has a zero (0) value, then the altnerate ROM location
+should be used.
+
+### Alternate ROM location
+
+Consists of 16384 registers 0x004000 - 0x007fff
+containing static configuration data.
+See section Configuration ROM.
+
+## Configuration ROM Format
 
 The register range 0x800 - 0xfff holds static data describing the device.
 In each 4 byte register, only the 2 lower bytes are used.
@@ -186,8 +189,7 @@ Contains:
 * Type 1 Descriptor with length 3 holding the string "Hello\0".
 * Type 0 Descriptor indicating end of ROM
 
-JSON Information
-----------------
+## JSON Information
 
 The JSON blob encoded in the Configuration ROM will contain a Object (aka. mapping or dictionary).
 The keys of this dictionary are symbolic register names,
@@ -209,9 +211,9 @@ The (first) Address of this register.
 Determines number of Addresses which constitute this register.
 Number of Addresses is 2 to the power of addr_width.
 
-<pre>
+```
   naddrs = 1u<<addr_width;
-</pre>
+```
 
 eg. an addr_width of 0 defines a register with exactly one Address.
 
@@ -229,7 +231,7 @@ An arbitrary string describing this register.
 
 ### Example
 
-<pre>
+```
 {
     "J18_debug": {
         "access": "r",
@@ -242,4 +244,4 @@ An arbitrary string describing this register.
         "special": "sauce"
     }
 }
-</pre>
+```
