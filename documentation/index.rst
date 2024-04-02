@@ -1,16 +1,8 @@
-.. LBNL Embedded Ethernet Protocol (LEEP) documentation master file, created by
-   sphinx-quickstart on Thu Jan 18 18:36:56 2018.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-Welcome to LEEP documentation!
+Welcome to FEED documentation!
 ==============================
 
-Documentation for the LBNL Embedded Ethernet Protocol (LEEP)
-interface python module.
-
-This module communicates with LEEP device either directly,
-or mediated by an EPICS IOC via the Channel Access protocol.
+Documentation for the EPICS driver and python module
+for interacting using the LBNL Embedded Ethernet Protocol (LEEP).
 
 Contents:
 
@@ -21,6 +13,7 @@ Contents:
    devsup
    usage
    api
+   proto
 
 Indices and tables
 ==================
