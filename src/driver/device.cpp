@@ -449,9 +449,17 @@ void Device::handle_send(Guard& G)
             // non-blocking sendto(), so we don't unlock here
             sock.sendto(peer_addr, (const char*)&msg.buf[0], msg.buf.size()*4);
             cnt_sent++;
-        }catch(SocketBusy&){
-            want_to_send = true;
-            return;
+        }catch(SocketError& e){
+            if(e.code==SOCK_EWOULDBLOCK) {
+                want_to_send = true;
+                return;
+            } else if(e.code==ENETUNREACH || e.code==EHOSTUNREACH) {
+                IFDBG(1, "Unable to send to %s : (%d) %s", peer_name.c_str(), e.code, e.what());
+                // Don't throw (and latch into Error state) what is probably
+                // a transient error.  Will timeout since packet wasn't sent
+            } else {
+                throw;
+            }
         }
         IFDBG(1, "Send seq=%08x %zu bytes", (unsigned)msg.seq, msg.buf.size()*4u);
 
@@ -952,8 +960,12 @@ void Device::run()
                                 doProcess[i] = true;
                                 cnt_recv++;
                                 cnt_recv_bytes += unsigned(feedUDPHeaderSize) + bufs[i].size();
-                            }catch(SocketBusy&){
-                                break;
+                            }catch(SocketError& e){
+                                if(e.code==SOCK_EWOULDBLOCK) {
+                                    break;
+                                } else {
+                                    throw;
+                                }
                             }
 
                             if(!doProcess[i]) {

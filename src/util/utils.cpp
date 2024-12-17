@@ -106,8 +106,6 @@ void Socket::sendto(const osiSockAddr& dest, const char* buf, size_t buflen) con
     ssize_t ret = ::sendto(sock, buf, buflen, 0, &dest.sa, sizeof(dest));
     if(ret<0) {
         int code = SOCKERRNO;
-        if(code==SOCK_EWOULDBLOCK)
-            throw SocketBusy();
         throw SocketError(code);
     } else if(size_t(ret)!=buflen)
         throw std::runtime_error("Incomplete sendto()");
@@ -119,8 +117,6 @@ size_t Socket::recvfrom(osiSockAddr& src, char* buf, size_t buflen) const
     ssize_t ret = ::recvfrom(sock, buf, buflen, 0, &src.sa, &len);
     if(ret<0) {
         int code = SOCKERRNO;
-        if(code==SOCK_EWOULDBLOCK)
-            throw SocketBusy();
         throw SocketError(code);
     }
     return size_t(ret);

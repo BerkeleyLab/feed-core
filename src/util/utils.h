@@ -59,12 +59,6 @@ struct epicsShareClass SocketError : public std::exception
     const char *what() const throw();
 };
 
-struct epicsShareClass SocketBusy : public SocketError
-{
-    SocketBusy() :SocketError(SOCK_EWOULDBLOCK) {}
-    virtual ~SocketBusy() throw() {}
-};
-
 // RAII handle to ensure that sockets aren't leaked
 // and helper to make socket calls throw SocketError
 struct Socket
