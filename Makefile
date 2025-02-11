@@ -29,3 +29,15 @@ DIRS += iocBoot
 UNINSTALL_DIRS += $(INSTALL_LOCATION)/opi
 
 include $(TOP)/configure/RULES_TOP
+
+sphinx:
+	$(MAKE) -C documentation html
+
+sphinx-clean:
+	$(MAKE) -C documentation html clean
+
+sphinx-commit: sphinx
+	touch documentation/_build/html/.nojekyll
+	./commit-gh.sh documentation/_build/html
+
+.PHONY: sphinx sphinx-commit sphinx-clean
