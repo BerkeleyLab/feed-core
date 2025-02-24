@@ -29,14 +29,14 @@
 #define MODE_CHIRP   5
 
 static
-void setamp_calc_ssa(double max_magn, double max_imag, double adesv, double imped, double freq, 
+void setamp_calc_ssa(double max_magn, double max_imag, double adesv, double imped, double freq,
 double *pol_x, double *pol_y, double *sqrtu, double qloaded, double fwd_fs, double *ssa, double *ssan)
 {
     /* Policy maximum X/Y */
     *pol_x = max_magn * sqrt(1 - max_imag);
     *pol_y = max_magn * sqrt(max_imag);
 
-    /* Cavity sqrt(energy) 
+    /* Cavity sqrt(energy)
      * V/(sqrt( (shunt impedance) * 2pi * (cav freq)))
      */
     *sqrtu = adesv / (sqrt(imped * 2 * PI * freq));
@@ -46,8 +46,8 @@ double *pol_x, double *pol_y, double *sqrtu, double qloaded, double fwd_fs, doub
     *ssan = *ssa / fwd_fs;
 }
 
-static 
-void setamp_calc_x_fb(double ssa_slope, double ssa_minx, double ssa_ped, double *ssan, 
+static
+void setamp_calc_x_fb(double ssa_slope, double ssa_minx, double ssa_ped, double *ssan,
 double *lowslope, double *x_lo, double *x_hi)
 {
 	*x_lo = ssa_slope * *ssan * 0.83;
@@ -62,9 +62,9 @@ void setamp_calc_x(double ssa_slope, double *ssan, double *lowslope, double *x_l
 	*x_lo = MIN(*x_lo, *lowslope * *ssan);
 }
 
-static 
-void setamp_calc(short debug, short amp_close, double max_magn, double max_imag, double adesv, double imped, double freq, 
-double *pol_x, double *pol_y, double *sqrtu, double qloaded, double fwd_fs, double ssa_slope, double ssa_minx, 
+static
+void setamp_calc(short debug, short amp_close, double max_magn, double max_imag, double adesv, double imped, double freq,
+double *pol_x, double *pol_y, double *sqrtu, double qloaded, double fwd_fs, double ssa_slope, double ssa_minx,
 double ssa_ped, double *ssa, double *ssan, double *lowslope, double *x_lo, double *x_hi)
 {
 
@@ -79,7 +79,7 @@ double ssa_ped, double *ssa, double *ssan, double *lowslope, double *x_lo, doubl
         printf("setAmpl: to affine sqrtu %f sqrt(J) ssa %f ssan %f\n", *sqrtu, *ssa, *ssan);
     }
 
-    if (amp_close) { 
+    if (amp_close) {
         setamp_calc_x_fb(ssa_slope, ssa_minx, ssa_ped, ssan, lowslope, x_lo, x_hi);
     }
     else {
@@ -88,7 +88,7 @@ double ssa_ped, double *ssa, double *ssan, double *lowslope, double *x_lo, doubl
     }
 }
 
-static 
+static
 long asub_setamp(aSubRecord *prec)
 {
     double CORDIC_SCALE = 0.774483*pow(2,17);
@@ -113,7 +113,7 @@ long asub_setamp(aSubRecord *prec)
 	rfctrl      = *(short *)prec->n,
 	rfmodectrl  = *(short *)prec->o,
 	rfmodeprev  = *(short *)prec->r;
- 
+
     /* Intermediate results */
     double *sqrtu = (double *)prec->vala,
 	*ssa      = (double *)prec->valb, /* SSA target */
@@ -162,7 +162,7 @@ long asub_setamp(aSubRecord *prec)
     *error_msg = *too_high = 0; /* Initialize to no errors */
 
 /* If RF control is set off, do not push values.
- * Leave error_msg at 0, though, because this is not 
+ * Leave error_msg at 0, though, because this is not
  * considered an error state and no accompanying
  * message should be necessary
  */
@@ -171,11 +171,11 @@ long asub_setamp(aSubRecord *prec)
         printf("%s: input values rfctrl %i rfmodectrl %i  prev %i ades %f MV imped %f ohms freq %f Hz qloaded %f "
                "amp_close %i pha_close %i ssa_slope %f ssa_minx %f ssa_ped %f "
                "fwd_fs %f sqrt(Watts) cav_fs %f MV mag_magn %f max_imag %f sel_aset %f fudge %f\n",
-               prec->name, rfctrl, rfmodectrl, rfmodeprev, ades, imped, freq, qloaded, amp_close, pha_close, ssa_slope, 
+               prec->name, rfctrl, rfmodectrl, rfmodeprev, ades, imped, freq, qloaded, amp_close, pha_close, ssa_slope,
                ssa_minx, ssa_ped, fwd_fs, cav_fs, max_magn, max_imag, sel_aset, fudge);
     }
 
-	/* Chirp control. 
+	/* Chirp control.
 	 * If entering mode, set up chirp parameters
 	 * If exiting mode, disable chirp
 	 * If request is on/chirp, enable chirp
@@ -197,8 +197,8 @@ long asub_setamp(aSubRecord *prec)
 			prec->name, *mask);
 	}
 
-	/* Pulse control. 
-	 * If entering mode, set lim/mag registers to 0 and disable chirp 
+	/* Pulse control.
+	 * If entering mode, set lim/mag registers to 0 and disable chirp
 	 */
 	if (rfmodectrl == MODE_PULSE) {
 		if (rfmodeprev != rfmodectrl) {
@@ -210,7 +210,7 @@ long asub_setamp(aSubRecord *prec)
 
 	/* SEL raw amplitude control */
 	if (rfmodectrl==MODE_SEL_RAW) {
-		sel_lim_max = (epicsInt32)(79500 * max_magn); /* 79500 max value of lims registers */ 
+		sel_lim_max = (epicsInt32)(79500 * max_magn); /* 79500 max value of lims registers */
 		sel_lim = (epicsInt32)(floor((sel_aset/100)*79500));
 		if ( sel_lim >= sel_lim_max ) {
 			*lim_x_lo = *lim_x_hi = sel_lim_max;
@@ -222,7 +222,7 @@ long asub_setamp(aSubRecord *prec)
 			printf("setAmpl: SEL raw mode: max lim %i sel_lim %i limxlo %i limxyhi %i limylo %i limyhi %i\n",
 				sel_lim_max, sel_lim, *lim_x_lo, *lim_x_hi, *lim_y_lo, *lim_y_hi);
 		}
-	  
+
 		if (rfctrl == 0) {
 			return 0;
 		}
@@ -230,13 +230,13 @@ long asub_setamp(aSubRecord *prec)
 		return 0;
 	}
 
-	setamp_calc(debug, amp_close, max_magn, max_imag, adesv, imped, freq, 
-		pol_x, pol_y, sqrtu, qloaded, fwd_fs, ssa_slope, ssa_minx, 
+	setamp_calc(debug, amp_close, max_magn, max_imag, adesv, imped, freq,
+		pol_x, pol_y, sqrtu, qloaded, fwd_fs, ssa_slope, ssa_minx,
 		ssa_ped, ssa, ssan, lowslope, x_lo, x_hi);
 
     *too_high = (*x_hi > *pol_x) ? 1 : 0;
-    x_lo_final = MIN(*x_lo, *pol_x); 
-    x_hi_final = MIN(*x_hi, *pol_x); 
+    x_lo_final = MIN(*x_lo, *pol_x);
+    x_hi_final = MIN(*x_hi, *pol_x);
 
     *lim_x_lo = (epicsInt32)(79500 * (x_lo_final));
     *lim_x_hi = (epicsInt32)(79500 * (x_hi_final));
@@ -337,7 +337,7 @@ asub_setamp_diag(aSubRecord *prec)
 		ssa_ped   = *(double *)prec->k,
 		max_magn  = *(double *)prec->l,
 		max_imag  = *(double *)prec->m;
- 
+
 	double ssa, ssan, lowslope, pol_x, pol_y, sqrtu;
 	double x_lo, x_hi;
 	int i;
@@ -356,8 +356,8 @@ asub_setamp_diag(aSubRecord *prec)
 		*zeros = (double *)prec->valj,         /* Zero, two elements */
 		*axis_x = (double *)prec->valk,        /* Graph x axis */
 		*axis_y = (double *)prec->vall,        /* Graph y axis */
-		*unit_x = (double *)prec->valm,        /* Unit semi-circle, x */                 
-		*unit_y = (double *)prec->valn,        /* Unit semi-circle, y */              
+		*unit_x = (double *)prec->valm,        /* Unit semi-circle, x */
+		*unit_y = (double *)prec->valn,        /* Unit semi-circle, y */
 
 		/* Scalars */
 		*sel_x = (double *)prec->valo, /* SEL x */
@@ -386,9 +386,9 @@ asub_setamp_diag(aSubRecord *prec)
 
 	zeros[0] = zeros[1] = 0;
 
-	axis_x[0] = -2; 
+	axis_x[0] = -2;
 	axis_x[1] = 2;
-	axis_y[0] = -2; 
+	axis_y[0] = -2;
 	axis_y[1] = 2;
 
 	for (i = 0; i < 50; i++) {
