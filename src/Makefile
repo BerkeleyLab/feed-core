@@ -35,6 +35,7 @@ LIB_SRCS += iocsh.cpp
 
 SRC_DIRS += $(TOP)/src/rf
 LIB_SRCS += asub.c
+LIB_SRCS += asub_setamp.c
 LIB_SRCS += calc.c
 
 ifeq ($(USE_FFTW),YES)
